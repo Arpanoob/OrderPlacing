@@ -107,10 +107,10 @@ npm run seed:inventory:prod
 npm run start:worker
 ```
 
-### For logs tracing
+### For logs tracing logs/app.log
 
 ```
-tail -n 100 -f log/app.log
+tail -n 100 -f logs/app.log
 ```
 
 System Architecture Overview
