@@ -39,3 +39,55 @@ https://www.postman.com/futureclo/workspace/xshipment/request/36444018-ce0d2706-
                     }
             (get) /api/order/:id =>id is uuid /orderid
             ```
+## env.development / env.production
+ make .env.development file
+ or .env.production file 
+ add these properties to them
+
+```
+PORT=
+MONGO_URI=
+JWT_PRIVATE_KEY=
+REDIS_HOST=
+REDIS_PORT=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_SES_SENDER_EMAIL=
+AWS_SQS_QUEUE_URL=
+AWS_REGION=
+AWS_SES_SENDER_EMAIL=
+```
+### Commands
+```
+git clone git@github.com:Arpanoob/OrderPlacing.git
+npm install
+npm run dev
+```
+or
+```
+git clone git@github.com:Arpanoob/OrderPlacing.git
+npm install
+npm run prod
+```
+or
+```
+git clone git@github.com:Arpanoob/OrderPlacing.git
+npm install
+npm run build
+npm run start
+```
+### for seeding the inventoey
+for env.development
+```
+npm run seed:inventory:dev
+```
+for env.production
+```
+npm run seed:inventory:prod
+```
+
+### To run consumer(SQS worker)
+
+```
+npm run start:worker
+```
