@@ -91,3 +91,19 @@ npm run seed:inventory:prod
 ```
 npm run start:worker
 ```
+ System Architecture Overview
+1. Client/User
+○ Places an order via API
+○ Receives confirmation email
+2. Order Service (Express.js + MongoDB)
+○ Handles order creation
+○ Validates inventory
+○ Pushes order to AWS SQS
+3. Order Processor Worker (Node.js Service)
+○ Listens to AWS SQS
+○ Processes order & updates status
+○ Stores order in Redis for quick retrieval
+○ Sends AWS SES email notification
+4. AWS Services
+○ SQS: Manages async processing queue
+○ SES: Sends email notifications
