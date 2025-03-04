@@ -57,6 +57,9 @@ AWS_SQS_QUEUE_URL=
 AWS_REGION=
 AWS_SES_SENDER_EMAIL=
 ```
+
+*for local mongodb url you need to add replica sets because transactions are used*
+
 ### Commands
 ```
 git clone git@github.com:Arpanoob/OrderPlacing.git
