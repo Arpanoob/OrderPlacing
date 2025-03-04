@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Confirmation - <%= orderId %></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h2>Order Confirmation - Order ID: <%= orderId %></h2>
+    <p>Dear Customer,</p>
+    <p>Your order has been <strong><%= status %></strong>.</p>
+
+    <h3>Order Details</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% order.items.forEach(item => { %>
+                <tr>
+                    <td><%= item.productId %></td>
+                    <td><%= item.quantity %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    <p>Thank you for shopping with us!</p>
+</body>
+</html>
