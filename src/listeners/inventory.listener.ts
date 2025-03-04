@@ -1,11 +1,8 @@
-
-
 //error come then in catch i can emit same event to retry aumaticaly works
 import { eventBus } from "../events/eventBus.event";
 import { EventTypes } from "../enums/event.enum";
 import { pushOrderToQueue } from "../services/orderProducer";
 import { withRetry } from "../utils/retry";
-import { EXCEPTION } from "../enums/warnings.enum";
 
 eventBus.on(EventTypes.InventoryChecked, async ({ userId, items, totalAmount, orderId, success,error }) => {
     try {

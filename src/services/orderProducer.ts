@@ -1,15 +1,7 @@
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { SendMessageCommand } from "@aws-sdk/client-sqs";
 import logger from "../utils/logger";
+import { sqsClientInvoke } from "../models/sqs.client";
 
-const sqsClient = new SQSClient({
-    region: "eu-north-1",
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    }
-});
-
-const QUEUE_URL = process.env.AWS_SQS_QUEUE_URL!;
 
 export const pushOrderToQueue = async (
     userId: string,
@@ -17,6 +9,7 @@ export const pushOrderToQueue = async (
     totalAmount: number,
     orderId: string
 ) => {
+    const { QUEUE_URL, sqsClient } = sqsClientInvoke();
     const messageBody = {
         orderId,
         userId,
@@ -26,10 +19,9 @@ export const pushOrderToQueue = async (
     };
 
     const params = {
-        QueueUrl: QUEUE_URL!,
+        QueueUrl: QUEUE_URL,
         MessageBody: JSON.stringify(messageBody),
     };
-
     const command = new SendMessageCommand(params);
 
     try {

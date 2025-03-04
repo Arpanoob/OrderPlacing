@@ -3,6 +3,7 @@ export enum EventTypes {
     InventoryChecked = "InventoryChecked",
     OrderProcessed = "OrderProcessed",
     OrderFailed = "OrderFailed",
-    PushInQueue="PushInQueue",
-    Error="Error"
+    PushInQueue = "PushInQueue",
+    Error = "Error",
+    MailSend = "MailSend",
 }

@@ -26,7 +26,9 @@ export const createOrder = async (
     });
 
     try {
-        //if stock is out , the it through error and on controller error get handled   
+        //if stock is out , the it through error and on controller error get handled 
+        //here not added order at redis because ,azuming the retrival will heavy not creation
+         
         await checkInventory(items);
         eventBus.emit(EventTypes.OrderCreated, { order });
         return order;
