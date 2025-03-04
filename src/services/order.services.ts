@@ -7,6 +7,8 @@ import { messages } from "../enums/messages.enum";
 import { EXCEPTION } from "../enums/warnings.enum";
 import { pushOrderToQueue } from "./orderProducer";
 import { ORDERS } from "../enums/orders.enum";
+import { EventTypes } from "../enums/event.enum";
+import { eventBus } from "../events/eventBus.event";
 
 
 export const createOrder = async (
@@ -15,7 +17,7 @@ export const createOrder = async (
     totalAmount: number
 ) => {
 
-    const order = new Order({
+    const order = await Order.create({
         orderId: uuidv4(),
         userId,
         items,
@@ -24,13 +26,9 @@ export const createOrder = async (
     });
 
     try {
+        //if stock is out , the it through error and on controller error get handled   
         await checkInventory(items);
-        await order.save()
-
-        const cacheKey = `order:${order.orderId}`;
-        await redisClient.set(cacheKey, JSON.stringify(order), "EX", 600);
-        await pushOrderToQueue(userId, items, totalAmount,order.orderId); 
-
+        eventBus.emit(EventTypes.OrderCreated, { order });
         return order;
     } catch (error) {
         throw error;

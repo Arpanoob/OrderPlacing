@@ -3,6 +3,12 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors'
 import cookieParser from "cookie-parser";
 
+import "./listeners/error.listner"
+import "./listeners/inventory.listener"
+import "./listeners/order.listener"
+import "./listeners/sqs.listener"
+
+
 import './config/loadEnv';
 
 import connectDB from './models/db';
