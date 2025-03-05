@@ -5,7 +5,6 @@ import redisClient from "../models/radisdb";
 import logger from "../utils/logger";
 import { messages } from "../enums/messages.enum";
 import { EXCEPTION } from "../enums/warnings.enum";
-import { pushOrderToQueue } from "./orderProducer";
 import { ORDERS } from "../enums/orders.enum";
 import { EventTypes } from "../enums/event.enum";
 import { eventBus } from "../events/eventBus.event";
