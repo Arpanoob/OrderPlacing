@@ -15,10 +15,12 @@ export const register = async (req: Request, res: Response) => {
             return res.status(400).json({ success: false, message: error.details[0].message });
         }
 
-        const result = await registerUser(req.body);
-        if (result.success && result.cookie) {
-            res.cookie(result.cookie.name, result.cookie.token, result.cookie.options);
+        const { cookie, ...result } = await registerUser(req.body);
+
+        if (result.success && cookie) {
+            res.cookie(cookie?.name, cookie?.token, cookie?.options);
         }
+
         res.status(result.status).json(result);
     } catch (error) {
         console.error(EXCEPTION.LOGIN_ERROR, error);
@@ -33,9 +35,9 @@ export const login = async (req: Request, res: Response) => {
             return res.status(400).json({ success: false, message: error.details[0].message });
         }
 
-        const result = await loginUser(req.body);
-        if (result.success && result.cookie) {
-            res.cookie(result.cookie.name, result.cookie.token, result.cookie.options);
+        const { cookie, ...result } = await loginUser(req.body);
+        if (result.success && cookie) {
+            res.cookie(cookie?.name, cookie?.token, cookie?.options);
         }
         res.status(result.status).json(result);
     } catch (error) {
@@ -46,9 +48,9 @@ export const login = async (req: Request, res: Response) => {
 
 export const refresh = async (req: AuthRequest, res: Response) => {
     try {
-        const result = await refreshUserToken(req.user?._id);
-        if (result.success && result.cookie) {
-            res.cookie(result.cookie.name, result.cookie.token, result.cookie.options);
+        const { cookie, ...result } = await refreshUserToken(req.user?._id);
+        if (result.success && cookie) {
+            res.cookie(cookie?.name, cookie?.token, cookie?.options);
         }
         res.status(result.status).json(result);
     } catch (error) {

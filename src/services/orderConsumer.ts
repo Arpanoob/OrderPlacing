@@ -5,7 +5,6 @@ import "../listeners/email.listener"
 import '../config/loadEnv';
 
 import connectDB from "../models/db";
-import redisClient from "../models/radisdb";
 import { Order } from '../models/order.model';
 import logger from "../utils/logger";
 import { User } from "../models/user.model";
@@ -13,7 +12,7 @@ import { messages } from "../enums/messages.enum";
 import { ORDERS } from "../enums/orders.enum";
 import { TEXTS } from "../enums/options.enum";
 import { EXCEPTION } from "../enums/warnings.enum";
-import { decrementInventory } from "./inventory.service";
+import { checkInventory, decrementInventory } from "./inventory.service";
 import { sendOrderEmail } from "./ses.services";
 import { sqsClientInvoke } from "../models/sqs.client";
 import { eventBus } from "../events/eventBus.event";
@@ -34,7 +33,9 @@ const processOrder = async (orderData: any) => {
         }
         const { items } = order
 
+        await checkInventory(order?.items)
         await decrementInventory(items, session);
+        
         order.status = ORDERS.Processed;
         await order.save({ session });
 
@@ -44,7 +45,7 @@ const processOrder = async (orderData: any) => {
         const { email } = user;
 
         eventBus.emit(EventTypes.OrderProcessed, { email, order, status: ORDERS.Processed })
-        
+
         await session.commitTransaction();
         session.endSession();
 

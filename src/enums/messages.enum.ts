@@ -11,5 +11,6 @@ export enum messages {
     LOADED_ENVS = "Loaded environment:",
     USER_NOT_FOUND = "User not Found",
     FAILED_PROCESSING_ORDER = "Failed processing order",
-    ORDER_RECIVED = "Order Recived"
+    ORDER_RECIVED = "Order Recived",
+    SUCCESSFULLY_REGISTERED = "Sucessfully Registered"
 }
