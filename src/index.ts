@@ -2,16 +2,16 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors'
 import cookieParser from "cookie-parser";
 
+import './config/loadEnv';
+
 //for event-driven
 import "./listeners/error.listner"
 import "./listeners/inventory.listener"
 import "./listeners/order.listener"
 import "./listeners/sqs.listener"
 import "./listeners/email.listener"
+import "./listeners/db.listener"
 
-import './config/loadEnv';
-
-import connectDB from './models/db';
 import logger from './utils/logger';
 
 import { EXCEPTION } from './enums/warnings.enum';
@@ -24,6 +24,10 @@ import orderRoutes from './routes/order.routes';
 
 import { verifyToken } from './middleware/jwt.middleware';
 
+import { withRetry } from './utils/retry';
+import { eventBus } from './events/eventBus.event';
+import { EventTypes } from './enums/event.enum';
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -35,17 +39,38 @@ app.use(ENDPOINTS.AUTH_START, authRoutes);
 app.use(verifyToken)
 app.use(ENDPOINTS.API, orderRoutes)
 
-connectDB();
-
 app.get('/', (req, res) => {
     logger.info('Received GET request at /');
     res.send('Hello, World!');
 });
 
-app.listen(PORT, () => {
-    logger.info(`${messages.SERVER_RUNNING} ${PORT} ${TEXTS.IN} ${process.env.NODE_ENV} ${TEXTS.MODE}`);
-});
 
+const startServer = () => {
+    return new Promise<void>((resolve, reject) => {
+        const server = app.listen(PORT, () => {
+            logger.info(`${messages.SERVER_RUNNING} ${PORT} ${TEXTS.IN} ${process.env.NODE_ENV} ${TEXTS.MODE}`);
+            resolve();
+            return;
+        });
+
+        server.on('error', (error) => {
+            logger.error(`${messages.FAILED_TO_START_SERVER} ${error.message}`);
+            reject(error);
+        });
+    });
+};
+const bootstrap = async () => {
+    try {
+        await withRetry(startServer, 3, 1000);
+        //To connect with db only when server get started
+        eventBus.emit(EventTypes.SERVER_STARTED)
+        logger.info(messages.SERVER_START_SUCESSFULLY);
+    } catch (error) {
+        logger.error(`${messages.FAILED_TO_START_SERVER} ${(error as Error).message}`);
+    }
+};
+
+bootstrap();
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(EXCEPTION.ERROR, err.message);

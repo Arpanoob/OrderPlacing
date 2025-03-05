@@ -1,5 +1,7 @@
 export enum messages {
     SERVER_RUNNING = "Server running on port",
+    SERVER_START_SUCESSFULLY = "Server started successfully.",
+    FAILED_TO_START_SERVER="Failed to start server after retries:",
     DB_CONNECTED_SUCESSFULLY = "MongoDB connected successfully",
     MONGO_CONNECTION_ERROR = " MongoDB connection error:",
     Already_Registered = "User already registered",

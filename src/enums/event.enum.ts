@@ -6,4 +6,6 @@ export enum EventTypes {
     PushInQueue = "PushInQueue",
     Error = "Error",
     MailSend = "MailSend",
+    SERVER_STARTED="ServerStarted",
+    DB_CONNECTED="DB_CONNECTED"
 }
