@@ -17,6 +17,7 @@ import { sendOrderEmail } from "./ses.services";
 import { sqsClientInvoke } from "../models/sqs.client";
 import { eventBus } from "../events/eventBus.event";
 import { EventTypes } from "../enums/event.enum";
+import redisClient from "../models/radisdb";
 
 
 
@@ -35,8 +36,16 @@ const processOrder = async (orderData: any) => {
 
         await checkInventory(order?.items)
         await decrementInventory(items, session);
-        
+
         order.status = ORDERS.Processed;
+
+        //update status in redis because
+        //when 1st time user hit endpoint if its state is pending then redis chache the pending state
+        //until it get expired but if it is proceeded then it must give updated state 
+
+        const cacheKey = `order:${order.orderId}`;
+        await redisClient.set(cacheKey, JSON.stringify(order), "EX", 600);
+
         await order.save({ session });
 
         const user = await User.findById(order.userId)
@@ -58,12 +67,23 @@ const processOrder = async (orderData: any) => {
 
         console.error(`${messages.FAILED_PROCESSING_ORDER} ${orderData.orderId}:`, error);
 
+        const cacheKey = `order:${orderData.orderId}`;
+        const cachedOrderStr = await redisClient.get(cacheKey);
+
+        if (cachedOrderStr) {
+            const cachedOrder = JSON.parse(cachedOrderStr);
+            cachedOrder.status = ORDERS.Failed;
+
+            await redisClient.set(cacheKey, JSON.stringify(cachedOrder), "EX", 600);
+        }
+
         await Order.updateOne({ orderId: orderData.orderId }, { status: ORDERS.Failed });
 
         await sendOrderEmail(orderData.userEmail, orderData, ORDERS.Failed);
 
         return false;
     }
+
 };
 
 const pollQueue = async () => {
