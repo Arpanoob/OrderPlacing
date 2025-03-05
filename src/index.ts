@@ -1,7 +1,13 @@
-
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors'
 import cookieParser from "cookie-parser";
+
+//for event-driven
+import "./listeners/error.listner"
+import "./listeners/inventory.listener"
+import "./listeners/order.listener"
+import "./listeners/sqs.listener"
+import "./listeners/email.listener"
 
 import './config/loadEnv';
 

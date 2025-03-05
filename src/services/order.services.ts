@@ -7,6 +7,8 @@ import { messages } from "../enums/messages.enum";
 import { EXCEPTION } from "../enums/warnings.enum";
 import { pushOrderToQueue } from "./orderProducer";
 import { ORDERS } from "../enums/orders.enum";
+import { EventTypes } from "../enums/event.enum";
+import { eventBus } from "../events/eventBus.event";
 
 
 export const createOrder = async (
@@ -14,23 +16,19 @@ export const createOrder = async (
     items: { productId: string; quantity: number }[],
     totalAmount: number
 ) => {
-
-    const order = new Order({
-        orderId: uuidv4(),
-        userId,
-        items,
-        totalAmount,
-        status: ORDERS.Pending
-    });
-
     try {
+        //if stock is out , the it throw error and on controller error get handled 
+        //here not added order at redis because ,assuming the retrival will heavy than creation
+        
         await checkInventory(items);
-        await order.save()
-
-        const cacheKey = `order:${order.orderId}`;
-        await redisClient.set(cacheKey, JSON.stringify(order), "EX", 600);
-        await pushOrderToQueue(userId, items, totalAmount,order.orderId); 
-
+        const order = await Order.create({
+            orderId: uuidv4(),
+            userId,
+            items,
+            totalAmount,
+            status: ORDERS.Pending
+        });
+        eventBus.emit(EventTypes.OrderCreated, { order });
         return order;
     } catch (error) {
         throw error;
@@ -51,7 +49,6 @@ export const getOrderById = async (orderId: string) => {
     const order = await Order.findOne({ orderId });
     if (!order) {
         logger.info(messages.NOTFOUND_IN_REDIS)
-
         throw new Error(EXCEPTION.ORDER_NOTFOUND);
     }
 

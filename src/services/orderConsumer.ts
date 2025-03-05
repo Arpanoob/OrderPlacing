@@ -1,14 +1,10 @@
-import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from "@aws-sdk/client-sqs";
+import { ReceiveMessageCommand, DeleteMessageCommand } from "@aws-sdk/client-sqs";
 import mongoose from 'mongoose';
-import path from 'path';
-import ejs from 'ejs';
-import { SendRawEmailCommand, SESClient } from "@aws-sdk/client-ses";
+import "../listeners/email.listener"
 
 import '../config/loadEnv';
 
 import connectDB from "../models/db";
-import redisClient from "../models/radisdb";
-import nodemailer from 'nodemailer';
 import { Order } from '../models/order.model';
 import logger from "../utils/logger";
 import { User } from "../models/user.model";
@@ -16,73 +12,53 @@ import { messages } from "../enums/messages.enum";
 import { ORDERS } from "../enums/orders.enum";
 import { TEXTS } from "../enums/options.enum";
 import { EXCEPTION } from "../enums/warnings.enum";
-import { decrementInventory } from "./inventory.service";
+import { checkInventory, decrementInventory } from "./inventory.service";
+import { sendOrderEmail } from "./ses.services";
+import { sqsClientInvoke } from "../models/sqs.client";
+import { eventBus } from "../events/eventBus.event";
+import { EventTypes } from "../enums/event.enum";
+import redisClient from "../models/radisdb";
 
-const templatePath = path.join(__dirname, '../templates/orderNotification.ejs');
 
-const sesClient = new SESClient({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    },
-});
-const sqsClient = new SQSClient({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    }
-});
 
-const QUEUE_URL = process.env.AWS_SQS_QUEUE_URL!;
-
-const transporter = nodemailer.createTransport({
-    SES: {
-        ses: sesClient,
-        aws: { SendRawEmailCommand }
-    }
-});
-
-const sendOrderEmail = async (email: string, order: any, status: string) => {
-    const emailTemplate = await ejs.renderFile(templatePath, { order, status, orderId: order.orderId });
-
-    await transporter.sendMail({
-        from: process.env.AWS_SES_SENDER_EMAIL,
-        to: email,
-        subject: `Order ${status}: ${order.orderId}`,
-        html: emailTemplate
-    });
-    logger.info(TEXTS.Email_SENDED_TO + email)
-};
 
 const processOrder = async (orderData: any) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-        const order = await Order.findOne({ orderId: orderData.orderId }).session(session);
+        const order = await Order.findOne({ orderId: orderData?.orderId }).session(session);
 
         if (!order) {
             throw new Error(EXCEPTION.ORDER_NOTFOUND);
         }
         const { items } = order
-        
+
+        await checkInventory(order?.items)
         await decrementInventory(items, session);
+
         order.status = ORDERS.Processed;
+
+        //update status in redis because
+        //when 1st time user hit endpoint if its state is pending then redis chache the pending state
+        //until it get expired but if it is proceeded then it must give updated state 
+
+        const cacheKey = `order:${order.orderId}`;
+        await redisClient.set(cacheKey, JSON.stringify(order), "EX", 600);
+
         await order.save({ session });
-        await redisClient.set(`order:${order.orderId}`, JSON.stringify(order), 'EX', 600);
 
         const user = await User.findById(order.userId)
         if (!user)
             throw new Error(messages.USER_NOT_FOUND);
+        const { email } = user;
 
-        await sendOrderEmail(user?.email!, order, ORDERS.Processed);
+        eventBus.emit(EventTypes.OrderProcessed, { email, order, status: ORDERS.Processed })
 
         await session.commitTransaction();
         session.endSession();
 
-        logger.info(`Order ${order.orderId} processed and cached.`);
+        logger.info(`Order ${order.orderId} processed.`);
         return true;
 
     } catch (error) {
@@ -91,15 +67,28 @@ const processOrder = async (orderData: any) => {
 
         console.error(`${messages.FAILED_PROCESSING_ORDER} ${orderData.orderId}:`, error);
 
+        const cacheKey = `order:${orderData.orderId}`;
+        const cachedOrderStr = await redisClient.get(cacheKey);
+
+        if (cachedOrderStr) {
+            const cachedOrder = JSON.parse(cachedOrderStr);
+            cachedOrder.status = ORDERS.Failed;
+
+            await redisClient.set(cacheKey, JSON.stringify(cachedOrder), "EX", 600);
+        }
+
         await Order.updateOne({ orderId: orderData.orderId }, { status: ORDERS.Failed });
 
         await sendOrderEmail(orderData.userEmail, orderData, ORDERS.Failed);
 
         return false;
     }
+
 };
 
 const pollQueue = async () => {
+    const { QUEUE_URL, sqsClient } = sqsClientInvoke()
+
     const params = {
         QueueUrl: QUEUE_URL,
         MaxNumberOfMessages: 1,
@@ -136,7 +125,7 @@ const startPolling = async () => {
 
     while (true) {
         await pollQueue();
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 11000));
     }
 };
 
