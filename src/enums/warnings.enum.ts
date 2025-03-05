@@ -2,7 +2,7 @@ export enum EXCEPTION {
     UNCAUGHT = 'UNCAUGHT EXCEPTION!  Shutting down...',
     UNHANDLED_REJECTION = "UNHANDLED REJECTION!  Shutting down...",
     INTERNAL_SERVER_ERROR = "Internal Server Error",
-    ERROR = "ERROR",
+    ERROR = "ERROR : ",
     MISSING_URI = "MONGO_URI is missing in environment variables",
     INVALID_ID_PASSWORD = "Invalid email or password",
     TOKEN_REFRESH_SUCESSFULLY = "Token refreshed successfully",

@@ -10,11 +10,11 @@ const connectDB = async () => {
         if (!mongoUri) {
             throw new Error(EXCEPTION.MISSING_URI);
         }
-
         await mongoose.connect(mongoUri);
         logger.info(messages.DB_CONNECTED_SUCESSFULLY);
     } catch (error) {
         logger.error(`${messages.MONGO_CONNECTION_ERROR} ${(error as Error).message}`);
+        throw new Error(EXCEPTION.ERROR + error);
     }
 };
 
