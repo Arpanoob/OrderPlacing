@@ -1,10 +1,11 @@
 import { ReceiveMessageCommand, DeleteMessageCommand } from "@aws-sdk/client-sqs";
 import mongoose from 'mongoose';
-import "../listeners/email.listener"
 
 import '../config/loadEnv';
 
-import connectDB from "../models/db";
+import "../listeners/email.listener"
+import "../listeners/db.listener"
+
 import { Order } from '../models/order.model';
 import logger from "../utils/logger";
 import { User } from "../models/user.model";
@@ -18,6 +19,7 @@ import { sqsClientInvoke } from "../models/sqs.client";
 import { eventBus } from "../events/eventBus.event";
 import { EventTypes } from "../enums/event.enum";
 import redisClient from "../models/radisdb";
+import { withRetry } from "../utils/retry";
 
 
 
@@ -28,7 +30,6 @@ const processOrder = async (orderData: any) => {
 
     try {
         const order = await Order.findOne({ orderId: orderData?.orderId }).session(session);
-
         if (!order) {
             throw new Error(EXCEPTION.ORDER_NOTFOUND);
         }
@@ -86,8 +87,14 @@ const processOrder = async (orderData: any) => {
 
 };
 
+const processOrderWithRetry = async (orderData: any) => {
+    return await withRetry(async () => {
+        return await processOrder(orderData);
+    }, 3, 1000);
+};
+
 const pollQueue = async () => {
-    const { QUEUE_URL, sqsClient } = sqsClientInvoke()
+    const { QUEUE_URL, sqsClient } = sqsClientInvoke();
 
     const params = {
         QueueUrl: QUEUE_URL,
@@ -97,7 +104,7 @@ const pollQueue = async () => {
 
     try {
         const command = new ReceiveMessageCommand(params);
-        const data = await sqsClient.send(command);
+        const data = await withRetry(() => sqsClient.send(command), 3, 1000);
 
         if (data.Messages && data.Messages.length > 0) {
             const message = data.Messages[0];
@@ -105,14 +112,14 @@ const pollQueue = async () => {
 
             logger.info(body, `${TEXTS.PROCESSING_ORDER} ${body.orderId} ` + data);
 
-            const success = await processOrder(body);
+            const success = await processOrderWithRetry(body);
 
             if (success) {
                 const deleteCommand = new DeleteMessageCommand({
                     QueueUrl: QUEUE_URL,
                     ReceiptHandle: message.ReceiptHandle!,
                 });
-                await sqsClient.send(deleteCommand);
+                await withRetry(() => sqsClient.send(deleteCommand), 3, 1000);
             }
         }
     } catch (error) {
@@ -120,13 +127,19 @@ const pollQueue = async () => {
     }
 };
 
-const startPolling = async () => {
-    await connectDB();
 
+const startPolling = async () => {
     while (true) {
-        await pollQueue();
+        try {
+            await pollQueue();
+        } catch (error) {
+            logger.error(`Polling loop error: ${error}`);
+        }
+
         await new Promise(resolve => setTimeout(resolve, 11000));
     }
 };
 
+
+eventBus.emit(EventTypes.SERVER_STARTED);
 startPolling().catch(console.error);

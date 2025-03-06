@@ -2,8 +2,6 @@ import { sesClientInvoke } from '../models/ses.client'
 import ejs from 'ejs';
 import path from 'path';
 
-
-
 export const sendOrderEmail = async (email: string, order: any, status: string) => {
     const { AWS_SES_SENDER_EMAIL, transporter } = sesClientInvoke()
 
