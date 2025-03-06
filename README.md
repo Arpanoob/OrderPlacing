@@ -78,7 +78,7 @@ npm install
 npm run prod
 ```
 
-or
+or (need prod .env.production)
 
 ```
 git clone git@github.com:Arpanoob/OrderPlacing.git
@@ -101,10 +101,16 @@ for env.production
 npm run seed:inventory:prod
 ```
 
-### To run consumer(SQS worker)
+### To run consumer(SQS worker and send SES mail)
 
+for dev (.env.development)
 ```
-npm run start:worker
+npm run start:worker:dev
+```
+
+for prod (.env.development) 
+```
+npm run start:worker:dev
 ```
 
 ### For logs tracing logs/app.log
