@@ -41,10 +41,13 @@ https://www.postman.com/futureclo/workspace/xshipment/request/36444018-ce0d2706-
             ```
 
 ## Step 1:
+
 ## Clone the repo
+
 ```
 git clone git@github.com:Arpanoob/OrderPlacing.git
 ```
+
 ## Step 2:
 
 ## env.development / env.production
@@ -72,6 +75,7 @@ _for local mongodb url you need to add replica sets because transactions are use
 ### Commands
 
 for dev env (.env.development)
+
 ```
 npm install
 npm run dev
@@ -92,7 +96,9 @@ npm install
 npm run build
 npm run start
 ```
+
 ## Step 3:
+
 ### for seeding the inventoey
 
 for env.development
@@ -108,22 +114,58 @@ npm run seed:inventory:prod
 ```
 
 ## Step 4:
+
 ### To run consumer(SQS worker and send SES mail)
 
 for dev (.env.development)
+
 ```
 npm run start:worker:dev
 ```
 
-for prod (.env.development) 
+for prod (.env.development)
+
 ```
 npm run start:worker:dev
 ```
 
+#### With PM2
+
+for prod DB
+
+```
+npm run start:worker:pm2:prod
+```
+
+for dev DB
+
+```
+npm run start:worker:pm2:dev
+```
+
+for deployment (used en .env.production)
+
+```
+npm run start:worker:deploy
+```
+
+to stop consumer/wprker pm2 window
+
+```
+stop:worker
+``
+to flush logs
+```
+
+pm2:flush:logs
+
+```
 ### For logs tracing logs/app.log
 
 ```
+
 tail -n 100 -f logs/app.log
+
 ```
 
 System Architecture Overview
@@ -143,3 +185,4 @@ System Architecture Overview
 4. AWS Services
    ○ SQS: Manages async processing queue
    ○ SES: Sends email notifications
+```

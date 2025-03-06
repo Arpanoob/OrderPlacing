@@ -14,7 +14,6 @@ import { ORDERS } from "../enums/orders.enum";
 import { TEXTS } from "../enums/options.enum";
 import { EXCEPTION } from "../enums/warnings.enum";
 import { checkInventory, decrementInventory } from "./inventory.service";
-import { sendOrderEmail } from "./ses.services";
 import { sqsClientInvoke } from "../models/sqs.client";
 import { eventBus } from "../events/eventBus.event";
 import { EventTypes } from "../enums/event.enum";
@@ -80,7 +79,7 @@ const processOrder = async (orderData: any) => {
 
         await Order.updateOne({ orderId: orderData.orderId }, { status: ORDERS.Failed });
 
-        await sendOrderEmail(orderData.userEmail, orderData, ORDERS.Failed);
+        eventBus.emit(EventTypes.OrderProcessed, { email:orderData, order:orderData, status: ORDERS.Failed })
 
         return false;
     }

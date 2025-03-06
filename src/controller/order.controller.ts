@@ -16,7 +16,7 @@ export const createOrderHandler = async (req: AuthRequest, res: Response) => {
         if (!userId) {
             return res.status(401).json({
                 success: false,
-                message: "User ID not provided"
+                message: messages.UNAUTHORIZED_ACCESS
             });
         }
         

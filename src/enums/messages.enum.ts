@@ -1,7 +1,7 @@
 export enum messages {
     SERVER_RUNNING = "Server running on port",
     SERVER_START_SUCESSFULLY = "Server started successfully.",
-    FAILED_TO_START_SERVER="Failed to start server after retries:",
+    FAILED_TO_START_SERVER = "Failed to start server after retries:",
     DB_CONNECTED_SUCESSFULLY = "MongoDB connected successfully",
     MONGO_CONNECTION_ERROR = " MongoDB connection error:",
     Already_Registered = "User already registered",
@@ -14,5 +14,6 @@ export enum messages {
     USER_NOT_FOUND = "User not Found",
     FAILED_PROCESSING_ORDER = "Failed processing order",
     ORDER_RECIVED = "Order Recived",
-    SUCCESSFULLY_REGISTERED = "Sucessfully Registered"
+    SUCCESSFULLY_REGISTERED = "Sucessfully Registered",
+    UNAUTHORIZED_ACCESS = "Unauthorized Access,"
 }
