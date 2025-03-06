@@ -40,6 +40,13 @@ https://www.postman.com/futureclo/workspace/xshipment/request/36444018-ce0d2706-
             (get) /api/order/:id =>id is uuid /orderid
             ```
 
+## Step 1:
+## Clone the repo
+```
+git clone git@github.com:Arpanoob/OrderPlacing.git
+```
+## Step 2:
+
 ## env.development / env.production
 
 make .env.development file
@@ -64,29 +71,28 @@ _for local mongodb url you need to add replica sets because transactions are use
 
 ### Commands
 
+for dev env (.env.development)
 ```
-git clone git@github.com:Arpanoob/OrderPlacing.git
 npm install
 npm run dev
 ```
 
 or
+for dev env (.env.production)
 
 ```
-git clone git@github.com:Arpanoob/OrderPlacing.git
 npm install
 npm run prod
 ```
 
-or (need prod .env.production)
+or to serve build (need prod .env.production)
 
 ```
-git clone git@github.com:Arpanoob/OrderPlacing.git
 npm install
 npm run build
 npm run start
 ```
-
+## Step 3:
 ### for seeding the inventoey
 
 for env.development
@@ -101,6 +107,7 @@ for env.production
 npm run seed:inventory:prod
 ```
 
+## Step 4:
 ### To run consumer(SQS worker and send SES mail)
 
 for dev (.env.development)
