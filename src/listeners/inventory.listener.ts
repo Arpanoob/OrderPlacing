@@ -1,4 +1,5 @@
-//error come then in catch i can emit same event to retry aumaticaly works
+// Another approch for retry can
+// //error come then in catch i can emit same event to retry aumaticaly works And put retries count in redis
 import { eventBus } from "../events/eventBus.event";
 import { EventTypes } from "../enums/event.enum";
 import { pushOrderToQueue } from "../services/orderProducer";
