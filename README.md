@@ -78,7 +78,7 @@ npm install
 npm run prod
 ```
 
-or
+or (need prod .env.production)
 
 ```
 git clone git@github.com:Arpanoob/OrderPlacing.git
