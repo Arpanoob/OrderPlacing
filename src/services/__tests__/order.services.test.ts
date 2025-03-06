@@ -1,3 +1,5 @@
+//can write more UNIT TESTS like this 
+
 import { Order } from "../../models/order.model";
 import { createOrder, getOrderById, updateOrderStatus } from "../order.services";
 import { checkInventory } from "../inventory.service";
@@ -7,7 +9,6 @@ import { ORDERS } from "../../enums/orders.enum";
 import { EXCEPTION } from "../../enums/warnings.enum";
 import { EventTypes } from "../../enums/event.enum";
 
-// Mock dependencies
 jest.mock("../../models/order.model");
 jest.mock("../inventory.service");
 jest.mock("../../models/radisdb");
