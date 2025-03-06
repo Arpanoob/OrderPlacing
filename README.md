@@ -148,6 +148,7 @@ for deployment (used en .env.production)
 ```
 npm run start:worker:deploy
 ```
+
 to stop consumer/worker pm2 window
 
 ```
@@ -164,6 +165,26 @@ npm run pm2:flush:logs
 
 ```
 tail -n 100 -f logs/app.log
+```
+
+### to run unit test cases
+
+in not watch mode
+
+```
+npm run test
+```
+
+in watch mode
+
+```
+npm run test:watch
+```
+
+for coverage
+
+```
+npm run test:coverage
 ```
 
 System Architecture Overview
@@ -183,4 +204,7 @@ System Architecture Overview
 4. AWS Services
    ○ SQS: Manages async processing queue
    ○ SES: Sends email notifications
+
+```
+
 ```
