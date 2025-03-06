@@ -8,7 +8,6 @@ export function sqsClientInvoke() {
             accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
             secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
         },
-        //it will retry 3 times if network error
         retryStrategy: new StandardRetryStrategy(async () => 3),
     });
     const QUEUE_URL = process.env.AWS_SQS_QUEUE_URL;

@@ -20,7 +20,7 @@ export const withRetry = async <T>(
             if (waitTime)
                 logger.warn(`Retry attempt ${attempt} failed. Retrying in ${waitTime / 1000} second... ${error}`);
             else
-                logger.warn(`Retry attempt ${attempt} failed.`);
+                logger.warn(`Retry attempt ${attempt} failed.`+error);
 
             if (waitTime && attempt < retries) {
                 await delay(waitTime);

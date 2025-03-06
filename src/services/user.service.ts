@@ -20,7 +20,7 @@ export const registerUser = async (data: { name: string, email: string, password
     return {
         status: 201,
         success: true,
-        message: messages.Already_Registered,
+        message: messages.SUCCESSFULLY_REGISTERED,
         user: {
             _id: user._id,
             name: user.name,

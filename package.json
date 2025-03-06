@@ -10,7 +10,8 @@
     "prod": "npm run build && npm run start",
     "seed:inventory:dev": "cross-env NODE_ENV=development  ts-node src/seed/inventory.seed.ts",
     "seed:inventory:prod": "cross-env NODE_ENV=production ts-node src/seed/inventory.seed.ts",
-    "start:worker": "cross-env NODE_ENV=development npx ts-node src/services/orderConsumer.ts"
+    "start:worker:dev": "cross-env NODE_ENV=development npx ts-node src/services/orderConsumer.ts",
+    "start:worker:prod": "cross-env NODE_ENV=production npx ts-node src/services/orderConsumer.ts"
   },
   "author": "",
   "license": "ISC",
