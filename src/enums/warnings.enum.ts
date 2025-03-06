@@ -12,6 +12,8 @@ export enum EXCEPTION {
     LOGIN_ERROR = "Login error:",
     REGISTRATION_ERROR = "Registration error:",
     INSUFFICIENT_STOCK_FOR_PRODUCT = "Insufficient stock for product",
-    ORDER_NOTFOUND="Order not found",
-    SQS_POOLING_ERROR="SQS Polling Error: "
+    ORDER_NOTFOUND = "Order not found",
+    SQS_POOLING_ERROR = "SQS Polling Error: ",
+    TOTAL_AMOUNT_NOT_EQUAL_ACCTUALY_QUANTITY = 'Total amount must equal to acctual quantity'
+
 }

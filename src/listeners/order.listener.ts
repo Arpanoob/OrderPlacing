@@ -5,7 +5,7 @@ import { checkInventory, decrementInventory } from "../services/inventory.servic
 eventBus.on(EventTypes.OrderCreated, async ({ order }) => {
     const { orderId, userId, items, totalAmount } = order;
     try {
-        await checkInventory(items);
+        await checkInventory(items,totalAmount);
         eventBus.emit(EventTypes.InventoryChecked, { orderId, userId, items, totalAmount, success: true });
     } catch (error) {
         eventBus.emit(EventTypes.InventoryChecked, { orderId, success: false, error });

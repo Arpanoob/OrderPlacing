@@ -35,7 +35,7 @@ const processOrder = async (orderData: any) => {
         }
         const { items } = order
 
-        await checkInventory(order?.items)
+        await checkInventory(order?.items,order.totalAmount)
         await decrementInventory(items, session);
 
         order.status = ORDERS.Processed;

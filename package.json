@@ -7,7 +7,7 @@
     "dev": "cross-env NODE_ENV=development nodemon",
     "build": "rm -rf dist && tsc",
     "start": "cross-env NODE_ENV=production node dist/index.js",
-    "prod": "npm run build && npm run start",
+    "prod": "cross-env NODE_ENV=production nodemon",
     "seed:inventory:dev": "cross-env NODE_ENV=development  ts-node src/seed/inventory.seed.ts",
     "seed:inventory:prod": "cross-env NODE_ENV=production ts-node src/seed/inventory.seed.ts",
     "start:worker:dev": "cross-env NODE_ENV=development npx ts-node src/services/orderConsumer.ts",

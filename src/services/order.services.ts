@@ -18,8 +18,8 @@ export const createOrder = async (
     try {
         //if stock is out , the it throw error and on controller error get handled 
         //here not added order at redis because ,assuming the retrival will heavy than creation
-        
-        await checkInventory(items);
+
+        await checkInventory(items, totalAmount);
         const order = await Order.create({
             orderId: uuidv4(),
             userId,
