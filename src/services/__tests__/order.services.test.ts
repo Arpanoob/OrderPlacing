@@ -5,7 +5,6 @@ import redisClient from "../../models/radisdb";
 import { eventBus } from "../../events/eventBus.event";
 import { ORDERS } from "../../enums/orders.enum";
 import { EXCEPTION } from "../../enums/warnings.enum";
-import { messages } from "../../enums/messages.enum";
 import { EventTypes } from "../../enums/event.enum";
 
 // Mock dependencies
@@ -38,7 +37,6 @@ describe("Order Services", () => {
     };
 
     it("should create an order successfully", async () => {
-      // Mock dependencies
       (checkInventory as jest.Mock).mockResolvedValue(true);
       (Order.create as jest.Mock).mockResolvedValue(mockCreatedOrder);
       (eventBus.emit as jest.Mock).mockImplementation(() => {});
