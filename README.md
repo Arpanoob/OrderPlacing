@@ -148,12 +148,10 @@ for deployment (used en .env.production)
 ```
 npm run start:worker:deploy
 ```
-to stop consumer/wprker pm2 window
+to stop consumer/worker pm2 window
 
 ```
-
 npm run stop:worker
-
 ```
 
 to flush logs
