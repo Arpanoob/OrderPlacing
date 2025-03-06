@@ -20,10 +20,7 @@ import { EventTypes } from "../enums/event.enum";
 import redisClient from "../models/radisdb";
 import { withRetry } from "../utils/retry";
 
-
-
-
-const processOrder = async (orderData: any) => {
+export const processOrder = async (orderData: any) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -86,13 +83,13 @@ const processOrder = async (orderData: any) => {
 
 };
 
-const processOrderWithRetry = async (orderData: any) => {
+export const processOrderWithRetry = async (orderData: any) => {
     return await withRetry(async () => {
         return await processOrder(orderData);
     }, 3, 1000);
 };
 
-const pollQueue = async () => {
+export const pollQueue = async () => {
     const { QUEUE_URL, sqsClient } = sqsClientInvoke();
 
     const params = {
@@ -127,7 +124,7 @@ const pollQueue = async () => {
 };
 
 
-const startPolling = async () => {
+export const startPolling = async () => {
     while (true) {
         try {
             await pollQueue();
