@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
 
 const startServer = () => {
     return new Promise<void>((resolve, reject) => {
-        const server = app.listen(PORT, () => {
+        const server = app.listen(PORT || 3000, () => {
             logger.info(`${messages.SERVER_RUNNING} ${PORT} ${TEXTS.IN} ${process.env.NODE_ENV} ${TEXTS.MODE}`);
             resolve();
             return;
