@@ -152,20 +152,17 @@ npm run start:worker:deploy
 to stop consumer/wprker pm2 window
 
 ```
-stop:worker
+npm run stop:worker
 ``
 to flush logs
+
 ```
-
-pm2:flush:logs
-
+npm run pm2:flush:logs
 ```
 ### For logs tracing logs/app.log
 
 ```
-
 tail -n 100 -f logs/app.log
-
 ```
 
 System Architecture Overview
